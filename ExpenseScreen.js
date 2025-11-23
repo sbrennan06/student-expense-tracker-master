@@ -18,6 +18,7 @@ export default function ExpenseScreen() {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
+  const [filter, setFilter] = useState("all");
 
   const loadExpenses = async () => {
     const rows = await db.getAllAsync(
@@ -25,6 +26,7 @@ export default function ExpenseScreen() {
     );
     setExpenses(rows);
   };
+
   const addExpense = async () => {
     const amountNumber = parseFloat(amount);
 
@@ -94,9 +96,44 @@ export default function ExpenseScreen() {
     setup();
   }, []);
 
+  const filteredExpenses = expenses.filter((exp) => {
+    if (filter === "all") return true;
+
+    if (!exp.date) return false;
+    const expDate = new Date(exp.date);
+    const now = new Date();
+
+    if (filter === "month") {
+      return (
+        expDate.getFullYear() === now.getFullYear() &&
+        expDate.getMonth() === now.getMonth()
+      );
+    }
+    if (filter === "week") {
+      const startOfWeek = new Date(now);
+      startOfWeek.setHours(0, 0, 0, 0);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+    }
+    return true;
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>Student Expense Tracker</Text>
+
+      <View
+        style={{
+          flexDirection: "rpw",
+          justifyContent: "space-around",
+          marginBottom: 12,
+        }}
+      >
+        <Button title="All" onPress={() => setFilter("all")} />
+        <Button title="This Week" onPress={() => setFilter("week")} />
+        <Button title="This Month" onPress={() => setFilter("month")} />
+      </View>
 
       <View style={styles.form}>
         <TextInput
