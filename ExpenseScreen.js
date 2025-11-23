@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -8,20 +8,20 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+} from "react-native";
+import { useSQLiteContext } from "expo-sqlite";
 
 export default function ExpenseScreen() {
   const db = useSQLiteContext();
 
   const [expenses, setExpenses] = useState([]);
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [note, setNote] = useState('');
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const [note, setNote] = useState("");
 
   const loadExpenses = async () => {
     const rows = await db.getAllAsync(
-      'SELECT * FROM expenses ORDER BY id DESC;'
+      "SELECT * FROM expenses ORDER BY id DESC;"
     );
     setExpenses(rows);
   };
@@ -42,28 +42,28 @@ export default function ExpenseScreen() {
     }
 
     await db.runAsync(
-      'INSERT INTO expenses (amount, category, note) VALUES (?, ?, ?);',
+      "INSERT INTO expenses (amount, category, note) VALUES (?, ?, ?);",
       [amountNumber, trimmedCategory, trimmedNote || null]
     );
 
-    setAmount('');
-    setCategory('');
-    setNote('');
+    setAmount("");
+    setCategory("");
+    setNote("");
 
     loadExpenses();
   };
-
 
   const deleteExpense = async (id) => {
-    await db.runAsync('DELETE FROM expenses WHERE id = ?;', [id]);
+    await db.runAsync("DELETE FROM expenses WHERE id = ?;", [id]);
     loadExpenses();
   };
-
 
   const renderExpense = ({ item }) => (
     <View style={styles.expenseRow}>
       <View style={{ flex: 1 }}>
-        <Text style={styles.expenseAmount}>${Number(item.amount).toFixed(2)}</Text>
+        <Text style={styles.expenseAmount}>
+          ${Number(item.amount).toFixed(2)}
+        </Text>
         <Text style={styles.expenseCategory}>{item.category}</Text>
         {item.note ? <Text style={styles.expenseNote}>{item.note}</Text> : null}
       </View>
@@ -82,6 +82,7 @@ export default function ExpenseScreen() {
           amount REAL NOT NULL,
           category TEXT NOT NULL,
           note TEXT
+          date TEXT NOT NULL
         );
       `);
 
@@ -125,9 +126,7 @@ export default function ExpenseScreen() {
         data={expenses}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderExpense}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No expenses yet.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.empty}>No expenses yet.</Text>}
       />
 
       <Text style={styles.footer}>
@@ -138,11 +137,11 @@ export default function ExpenseScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#111827' },
+  container: { flex: 1, padding: 16, backgroundColor: "#111827" },
   heading: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
     marginBottom: 16,
   },
   form: {
@@ -151,46 +150,46 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 10,
-    backgroundColor: '#1f2937',
-    color: '#fff',
+    backgroundColor: "#1f2937",
+    color: "#fff",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#374151',
+    borderColor: "#374151",
   },
   expenseRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1f2937',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1f2937",
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
   },
   expenseAmount: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#fbbf24',
+    fontWeight: "700",
+    color: "#fbbf24",
   },
   expenseCategory: {
     fontSize: 14,
-    color: '#e5e7eb',
+    color: "#e5e7eb",
   },
   expenseNote: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: "#9ca3af",
   },
   delete: {
-    color: '#f87171',
+    color: "#f87171",
     fontSize: 20,
     marginLeft: 12,
   },
   empty: {
-    color: '#9ca3af',
+    color: "#9ca3af",
     marginTop: 24,
-    textAlign: 'center',
+    textAlign: "center",
   },
   footer: {
-    textAlign: 'center',
-    color: '#6b7280',
+    textAlign: "center",
+    color: "#6b7280",
     marginTop: 12,
     fontSize: 12,
   },
