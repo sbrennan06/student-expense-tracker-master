@@ -41,9 +41,11 @@ export default function ExpenseScreen() {
       return;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
     await db.runAsync(
-      "INSERT INTO expenses (amount, category, note) VALUES (?, ?, ?);",
-      [amountNumber, trimmedCategory, trimmedNote || null]
+      "INSERT INTO expenses (amount, category, note, date) VALUES (?, ?, ?, ?);",
+      [amountNumber, trimmedCategory, trimmedNote || null, today]
     );
 
     setAmount("");
@@ -81,7 +83,7 @@ export default function ExpenseScreen() {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           amount REAL NOT NULL,
           category TEXT NOT NULL,
-          note TEXT
+          note TEXT,
           date TEXT NOT NULL
         );
       `);
