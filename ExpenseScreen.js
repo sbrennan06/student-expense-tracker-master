@@ -19,6 +19,10 @@ export default function ExpenseScreen() {
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
   const [filter, setFilter] = useState("all");
+  const [editing, setEditing] = useState(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editNote, setEditNote] = useState("");
 
   const loadExpenses = async () => {
     const rows = await db.getAllAsync(
@@ -72,6 +76,16 @@ export default function ExpenseScreen() {
         {item.note ? <Text style={styles.expenseNote}>{item.note}</Text> : null}
       </View>
 
+      <TouchableOpacity
+        onPress={() => {
+          setEditing(item.id);
+          setEditAmount(String(item.amount));
+          setEditCategory(item.category);
+          setEditNote(item.note || "");
+        }}
+      >
+        <Text style={{ color: "#93c5fd", marginRight: 12 }}>Edit</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => deleteExpense(item.id)}>
         <Text style={styles.delete}>✕</Text>
       </TouchableOpacity>
@@ -161,6 +175,73 @@ export default function ExpenseScreen() {
         />
         <Button title="Add Expense" onPress={addExpense} />
       </View>
+
+      <View
+        style={{
+          padding: 12,
+          backgroundColor: "#1f2937",
+          borderRadius: 8,
+          marginBottom: 12,
+        }}
+      >
+        <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+          Total: $
+          {filteredExpenses
+            .reduce((sum, e) => sum + Number(e.amount), 0)
+            .toFixed(2)}
+        </Text>
+      </View>
+
+      {editing && (
+        <View
+          style={{
+            backgroundColor: "#1f2937",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 12,
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 16, marginBottom: 8 }}>
+            Editing Expense #{editing}
+          </Text>
+
+          <TextInput
+            style={styles.input}
+            value={editAmount}
+            onChangeText={setEditAmount}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            value={editCategory}
+            onChangeText={setEditCategory}
+          />
+          <TextInput
+            style={styles.input}
+            value={editNote}
+            onChangeText={setEditNote}
+          />
+
+          <Button
+            title="Save Changes"
+            onPress={async () => {
+              await db.runAsync(
+                "UPDATE expenses SET amount = ?, category = ?, note = ? WHERE id = ?;",
+                [
+                  Number(editAmount),
+                  editCategory.trim(),
+                  editNote.trim(),
+                  editing,
+                ]
+              );
+              setEditing(null);
+              loadExpenses();
+            }}
+          />
+
+          <Button title="Cancel" onPress={() => setEditing(null)} />
+        </View>
+      )}
 
       <FlatList
         data={filteredExpenses}
