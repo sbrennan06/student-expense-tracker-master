@@ -115,6 +115,7 @@ export default function ExpenseScreen() {
       startOfWeek.setDate(now.getDate() - now.getDay());
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 7);
+      return expDate >= startOfWeek && expDate < endOfWeek;
     }
     return true;
   });
@@ -125,7 +126,7 @@ export default function ExpenseScreen() {
 
       <View
         style={{
-          flexDirection: "rpw",
+          flexDirection: "row",
           justifyContent: "space-around",
           marginBottom: 12,
         }}
@@ -162,7 +163,7 @@ export default function ExpenseScreen() {
       </View>
 
       <FlatList
-        data={expenses}
+        data={filteredExpenses}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderExpense}
         ListEmptyComponent={<Text style={styles.empty}>No expenses yet.</Text>}
